@@ -48,12 +48,12 @@ const App = () => {
               setMessage(null);
             }, 5000);
           })
-          .catch(() => {
+          .catch((error) => {
             setMessage({
-              content: `Information of '${newName}' has already been removed from server`,
+              content: error.response.data.error,
               color: "red",
             });
-            setPersons(persons.filter((p) => p.id !== person.id));
+            //setPersons(persons.filter((p) => p.id !== person.id));
             setTimeout(() => {
               setMessage({ content: null, color: "green" });
             }, 5000);
@@ -62,15 +62,23 @@ const App = () => {
       }
     }
 
-    personServer.create(newPerson).then((returnedPerson) => {
-      setPersons(persons.concat(returnedPerson));
-      setMessage({ content: `Added '${newName}'`, color: "green" });
-      setNewName("");
-      setNewNumber("");
-      setTimeout(() => {
-        setMessage({ content: null, color: "green" });
-      }, 5000);
-    });
+    personServer
+      .create(newPerson)
+      .then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+        setMessage({ content: `Added '${newName}'`, color: "green" });
+        setNewName("");
+        setNewNumber("");
+        setTimeout(() => {
+          setMessage({ content: null, color: "green" });
+        }, 5000);
+      })
+      .catch((error) => {
+        setMessage({ content: error.response.data.error, color: "red" });
+        setTimeout(() => {
+          setMessage({ content: null, color: "green" });
+        }, 5000);
+      });
   };
 
   const handleNameChange = (event) => {
