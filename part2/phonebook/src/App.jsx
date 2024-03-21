@@ -50,10 +50,11 @@ const App = () => {
           })
           .catch((error) => {
             setMessage({
-              content: error.response.data.error,
+              content: `${error.response.data.error}`,
               color: "red",
             });
-            //setPersons(persons.filter((p) => p.id !== person.id));
+            // This was useful on past situations and statuses of the app
+            // setPersons(persons.filter((p) => p.id !== person.id));
             setTimeout(() => {
               setMessage({ content: null, color: "green" });
             }, 5000);
@@ -74,7 +75,10 @@ const App = () => {
         }, 5000);
       })
       .catch((error) => {
-        setMessage({ content: error.response.data.error, color: "red" });
+        setMessage({
+          content: `Failed to add '${newName}': ${error.response.data.error}`,
+          color: "red",
+        });
         setTimeout(() => {
           setMessage({ content: null, color: "green" });
         }, 5000);
