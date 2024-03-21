@@ -2,9 +2,10 @@ const config = require('./utils/config')
 const express = require('express')
 const app = express()
 const cors = require('cors')
-//const notesRouter = require('./controllers/notes')
+const blogsRouter = require('./controllers/blogs')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
+const middleware = require('./utils/middleware')
 
 mongoose.set('strictQuery', false)
 
@@ -20,8 +21,13 @@ mongoose.connect(config.MONGODB_URI)
 
 app.use(cors())
 app.use(express.json())
+app.use(middleware.requestLogger)
 
-//app.use('/api/blogs', notesRouter)
+// el equivalente a todos los endpoints de notesRouter en el caso de blog
+app.use('/api/blogs', blogsRouter) 
+
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 
 
 module.exports = app
