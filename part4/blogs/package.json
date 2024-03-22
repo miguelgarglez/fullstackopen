@@ -4,13 +4,19 @@
   "description": "blog app",
   "main": "index.js",
   "scripts": {
+    "test": "jest --verbose",
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint .",
+    "build:ui": "rm -rf build && cd ../../part2/experiments/ && npm run build && cp -r build ../../part4",
+    "deploy": "fly deploy",
+    "deploy:full": "npm run build:ui && npm run deploy",
+    "logs:prod": "fly logs"
   },
   "author": "Miguel García",
   "license": "MIT",
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.0"
   },
   "dependencies": {
