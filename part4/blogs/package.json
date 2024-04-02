@@ -4,9 +4,9 @@
   "description": "blog app",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose",
-    "dev": "nodemon index.js",
-    "start": "node index.js",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
     "lint": "eslint .",
     "build:ui": "rm -rf build && cd ../../part2/experiments/ && npm run build && cp -r build ../../part4",
     "deploy": "fly deploy",
@@ -17,10 +17,12 @@
   "license": "MIT",
   "devDependencies": {
     "jest": "^29.7.0",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "supertest": "^6.3.4"
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.1",
     "mongoose": "^8.2.2"
