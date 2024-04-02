@@ -83,6 +83,13 @@ const initialBlogs = [
   }
 ]
 
+const blogToAdd = {
+    title: "Type wars",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+    likes: 23
+}
+
 
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
@@ -90,5 +97,5 @@ const blogsInDb = async () => {
 }
 
 module.exports = {
-  listOfBlogs, initialBlogs, blogsInDb, listWithOneBlog
+  listOfBlogs, initialBlogs, blogsInDb, listWithOneBlog, blogToAdd
 }

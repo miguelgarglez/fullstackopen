@@ -29,6 +29,37 @@ test('all blogs are returned', async () => {
   expect(response.body).toHaveLength(helper.initialBlogs.length)
 })
 
+
+test('blog has an id property', async () => {
+    const response = await api.get('/api/blogs')
+    expect(response.body[0].id).toBeDefined()
+})
+
+
+test('a specific blog is within the returned blogs', async () => {
+  const response = await api.get('/api/blogs')
+
+  const titles = response.body.map(r => r.title)
+
+  expect(titles).toContain(
+    'React patterns'
+  )
+})
+
+
+test('a valid blog can be added ', async () => {
+    await api
+        .post('/api/blogs')
+        .send(helper.blogToAdd)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+    const response = await api.get('/api/blogs')
+    const titles = response.body.map(r => r.title)
+    expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
+    expect(titles).toContain(helper.blogToAdd.title)
+})
+
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
