@@ -83,11 +83,30 @@ const initialBlogs = [
   }
 ]
 
+const invalidBlogs = [
+    {
+        title: "Blog without URL",
+        author: "Mikka Heikkinen",
+        likes: 3
+    },
+    {
+        author: "Mikka Heikkinen",
+        url: "http://www.mikkaheikkinen.com/missing/title/blog.html",
+        likes: 7
+    }
+]
+
 const blogToAdd = {
     title: "Type wars",
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 23
+}
+
+const blogWithoutLikes = {
+    title: "Create a blog without likes",
+    author: "Mikka Heikkinen",
+    url: "http://www.mikkaheikkinen.com/2024/04/03/blog.html"
 }
 
 
@@ -97,5 +116,5 @@ const blogsInDb = async () => {
 }
 
 module.exports = {
-  listOfBlogs, initialBlogs, blogsInDb, listWithOneBlog, blogToAdd
+  listOfBlogs, initialBlogs, blogsInDb, listWithOneBlog, blogToAdd, blogWithoutLikes, invalidBlogs
 }
