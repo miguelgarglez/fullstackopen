@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const listHelper = require('../utils/list_helper')
 const helper = require('./test_helper')
 
