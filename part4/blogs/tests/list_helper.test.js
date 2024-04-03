@@ -9,7 +9,7 @@ test('dummy returns one', () => {
   expect(result).toBe(1)
 })
 
-const blogs = helper.initialBlogs
+const blogs = helper.listOfBlogs
 
 const listWithOneBlog = helper.listWithOneBlog
 
