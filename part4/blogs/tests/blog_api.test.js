@@ -10,12 +10,30 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 
 beforeEach(async () => {
-  await Blog.deleteMany({})
 
-  const blogObjects = helper.initialBlogs
+  // Reset test database
+  await Blog.deleteMany({})
+  await User.deleteMany({})
+
+  const testUser = await helper.testUser()
+  const userObject = new User(testUser)
+
+  const blogsWithUser = helper.initialBlogs.map(blog => ({...blog, user: userObject._id}))
+  const blogObjects = blogsWithUser
     .map(blog => new Blog(blog))
   const promiseArray = blogObjects.map(blog => blog.save())
+  promiseArray.push(userObject.save())
   await Promise.all(promiseArray)
+
+  // login with user and obtain access token
+  const response = await api
+    .post('/api/login')
+    .send({
+      username: 'testuser',
+      password: 'testpassword',
+    });
+
+  token = response.body.token;
 })
 
 
@@ -60,6 +78,7 @@ describe('addition of a new blog', () => {
     test('a valid blog can be added ', async () => {
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(helper.blogToAdd)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -72,6 +91,7 @@ describe('addition of a new blog', () => {
     test('a blog without likes has 0 likes', async () => {
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(helper.blogWithoutLikes)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -82,14 +102,26 @@ describe('addition of a new blog', () => {
 
 
     test('a blog without title and url is not added', async () => {
+        
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(helper.invalidBlogs[0])
             .expect(400)
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(helper.invalidBlogs[1])
             .expect(400)
+        const response = await api.get('/api/blogs')
+        expect(response.body).toHaveLength(helper.initialBlogs.length)
+    })
+
+    test('a blog without token is not added', async () => {
+        await api
+            .post('/api/blogs')
+            .send(helper.blogToAdd)
+            .expect(401)
         const response = await api.get('/api/blogs')
         expect(response.body).toHaveLength(helper.initialBlogs.length)
     })
@@ -102,6 +134,7 @@ describe('deletion of a blog', () => {
         const blogToDelete = blogsAtStart[0]
         await api
             .delete(`/api/blogs/${blogToDelete.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(204)
         const blogsAtEnd = await helper.blogsInDb()
         expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
