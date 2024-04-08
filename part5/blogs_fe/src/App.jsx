@@ -4,7 +4,7 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 const App = () => {
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [message, setMessage] = useState({ content: null, color: "green" });
   const [blogs, setBlogs] = useState([]);
   const [newBlogTitle, setNewBlogTitle] = useState("");
   const [newBlogAuthor, setNewBlogAuthor] = useState("");
@@ -42,9 +42,9 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (exception) {
-      setErrorMessage("Wrong credentials");
+      setMessage({ content: `Wrong username or password`, color: "red" });
       setTimeout(() => {
-        setErrorMessage(null);
+        setMessage(null);
       }, 5000);
     }
   };
@@ -104,7 +104,7 @@ const App = () => {
           onChange={handleBlogUrlChange}
         />
       </div>
-      <button type="submit">save</button>
+      <button type="submit">Create</button>
     </form>
   );
 
@@ -131,27 +131,45 @@ const App = () => {
       url: newBlogUrl,
     };
 
-    blogService.create(blogObject).then((returnedBlog) => {
-      setBlogs(blogs.concat(returnedBlog));
-      setNewBlogAuthor("");
-      setNewBlogTitle("");
-      setNewBlogUrl("");
-    });
+    try {
+      blogService.create(blogObject).then((returnedBlog) => {
+        setBlogs(blogs.concat(returnedBlog));
+        setNewBlogAuthor("");
+        setNewBlogTitle("");
+        setNewBlogUrl("");
+        setMessage({
+          content: `a new blog ${returnedBlog.title} by ${returnedBlog.author} added`,
+          color: "green",
+        });
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      });
+    } catch (error) {
+      setMessage({ content: `Error creating blog: ${error}`, color: "red" });
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+    }
   };
 
   return (
     <div>
-      <Notification message={errorMessage} />
+      <h2>blogs</h2>
+      {message !== null ? (
+        <Notification message={message.content} color={message.color} />
+      ) : null}
       {user === null ? (
         loginForm()
       ) : (
         <div>
-          <p>{user.name} logged-in</p>
-          <button onClick={handleLogout}>Logout</button>
+          <p>
+            {user.name} logged-in <button onClick={handleLogout}>Logout</button>
+          </p>
 
+          <h2>Create new</h2>
           {blogForm()}
 
-          <h2>blogs</h2>
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
           ))}
@@ -161,12 +179,22 @@ const App = () => {
   );
 };
 
-const Notification = ({ message }) => {
+const Notification = ({ message, color }) => {
+  const notificationStyle = {
+    color: color,
+    background: "lightgrey",
+    fontSize: 20,
+    borderStyle: "solid",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  };
+
   if (message === null) {
     return null;
   }
 
-  return <div className="error">{message}</div>;
+  return <div style={notificationStyle}>{message}</div>;
 };
 
 export default App;
