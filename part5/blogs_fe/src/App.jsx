@@ -8,9 +8,6 @@ import Togglable from "./components/Togglable";
 const App = () => {
   const [message, setMessage] = useState({ content: null, color: "green" });
   const [blogs, setBlogs] = useState([]);
-  const [newBlogTitle, setNewBlogTitle] = useState("");
-  const [newBlogAuthor, setNewBlogAuthor] = useState("");
-  const [newBlogUrl, setNewBlogUrl] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
@@ -51,6 +48,25 @@ const App = () => {
     }
   };
 
+  const addBlog = async (blogObject) => {
+    try {
+      const newBlog = await blogService.create(blogObject);
+      setBlogs(blogs.concat(newBlog));
+      setMessage({
+        content: `a new blog ${newBlog.title} by ${newBlog.author} added`,
+        color: "green",
+      });
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+    } catch (exception) {
+      setMessage({ content: "Error adding blog", color: "red" });
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+    }
+  };
+
   const loginForm = () => (
     <form onSubmit={handleLogin}>
       <div>
@@ -81,62 +97,7 @@ const App = () => {
   };
 
   const blogForm = () => {
-    return (
-      <BlogForm
-        addBlog={addBlog}
-        handleBlogAuthorChange={handleBlogAuthorChange}
-        handleBlogTitleChange={handleBlogTitleChange}
-        handleBlogUrlChange={handleBlogUrlChange}
-        newBlogAuthor={newBlogAuthor}
-        newBlogTitle={newBlogTitle}
-        newBlogUrl={newBlogUrl}
-      />
-    );
-  };
-
-  const handleBlogTitleChange = (event) => {
-    console.log(event.target.value);
-    setNewBlogTitle(event.target.value);
-  };
-
-  const handleBlogAuthorChange = (event) => {
-    console.log(event.target.value);
-    setNewBlogAuthor(event.target.value);
-  };
-
-  const handleBlogUrlChange = (event) => {
-    console.log(event.target.value);
-    setNewBlogUrl(event.target.value);
-  };
-
-  const addBlog = (event) => {
-    event.preventDefault();
-    const blogObject = {
-      title: newBlogTitle,
-      author: newBlogAuthor,
-      url: newBlogUrl,
-    };
-
-    try {
-      blogService.create(blogObject).then((returnedBlog) => {
-        setBlogs(blogs.concat(returnedBlog));
-        setNewBlogAuthor("");
-        setNewBlogTitle("");
-        setNewBlogUrl("");
-        setMessage({
-          content: `a new blog ${returnedBlog.title} by ${returnedBlog.author} added`,
-          color: "green",
-        });
-        setTimeout(() => {
-          setMessage(null);
-        }, 5000);
-      });
-    } catch (error) {
-      setMessage({ content: `Error creating blog: ${error}`, color: "red" });
-      setTimeout(() => {
-        setMessage(null);
-      }, 5000);
-    }
+    return <BlogForm createBlog={addBlog} />;
   };
 
   return (

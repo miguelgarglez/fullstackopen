@@ -1,12 +1,19 @@
-const BlogForm = ({
-  addBlog,
-  handleBlogAuthorChange,
-  handleBlogTitleChange,
-  handleBlogUrlChange,
-  newBlogAuthor,
-  newBlogTitle,
-  newBlogUrl,
-}) => {
+import { useState } from "react";
+
+const BlogForm = ({ createBlog }) => {
+  const [newBlogTitle, setNewBlogTitle] = useState("");
+  const [newBlogAuthor, setNewBlogAuthor] = useState("");
+  const [newBlogUrl, setNewBlogUrl] = useState("");
+
+  const addBlog = (event) => {
+    event.preventDefault();
+    createBlog({
+      title: newBlogTitle,
+      author: newBlogAuthor,
+      url: newBlogUrl,
+    });
+  };
+
   return (
     <form onSubmit={addBlog}>
       <div>
@@ -14,7 +21,9 @@ const BlogForm = ({
         <input
           id="newBlogTitle"
           value={newBlogTitle}
-          onChange={handleBlogTitleChange}
+          onChange={(event) => {
+            setNewBlogTitle(event.target.value);
+          }}
         />
       </div>
       <div>
@@ -22,7 +31,9 @@ const BlogForm = ({
         <input
           id="newBlogAuthor"
           value={newBlogAuthor}
-          onChange={handleBlogAuthorChange}
+          onChange={(event) => {
+            setNewBlogAuthor(event.target.value);
+          }}
         />
       </div>
       <div>
@@ -30,7 +41,9 @@ const BlogForm = ({
         <input
           id="newBlogUrl"
           value={newBlogUrl}
-          onChange={handleBlogUrlChange}
+          onChange={(event) => {
+            setNewBlogUrl(event.target.value);
+          }}
         />
       </div>
       <button type="submit">Create</button>
