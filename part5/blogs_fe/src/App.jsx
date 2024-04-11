@@ -51,7 +51,9 @@ const App = () => {
   const addBlog = async (blogObject) => {
     try {
       const newBlog = await blogService.create(blogObject);
-      setBlogs(blogs.concat(newBlog));
+      const populatedBlog = await blogService.getOne(newBlog.id);
+      setBlogs(blogs.concat(populatedBlog));
+      console.log("populatedBlog:", populatedBlog);
       setMessage({
         content: `a new blog ${newBlog.title} by ${newBlog.author} added`,
         color: "green",
