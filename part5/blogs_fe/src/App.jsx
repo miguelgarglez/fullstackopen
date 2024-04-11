@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import BlogForm from "./components/BlogForm";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   const [message, setMessage] = useState({ content: null, color: "green" });
@@ -78,35 +80,19 @@ const App = () => {
     setUser(null);
   };
 
-  const blogForm = () => (
-    <form onSubmit={addBlog}>
-      <div>
-        <label htmlFor="newBlogTitle">Title:</label>
-        <input
-          id="newBlogTitle"
-          value={newBlogTitle}
-          onChange={handleBlogTitleChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="newBlogAuthor">Author:</label>
-        <input
-          id="newBlogAuthor"
-          value={newBlogAuthor}
-          onChange={handleBlogAuthorChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="newBlogUrl">URL:</label>
-        <input
-          id="newBlogUrl"
-          value={newBlogUrl}
-          onChange={handleBlogUrlChange}
-        />
-      </div>
-      <button type="submit">Create</button>
-    </form>
-  );
+  const blogForm = () => {
+    return (
+      <BlogForm
+        addBlog={addBlog}
+        handleBlogAuthorChange={handleBlogAuthorChange}
+        handleBlogTitleChange={handleBlogTitleChange}
+        handleBlogUrlChange={handleBlogUrlChange}
+        newBlogAuthor={newBlogAuthor}
+        newBlogTitle={newBlogTitle}
+        newBlogUrl={newBlogUrl}
+      />
+    );
+  };
 
   const handleBlogTitleChange = (event) => {
     console.log(event.target.value);
@@ -159,16 +145,14 @@ const App = () => {
       {message !== null ? (
         <Notification message={message.content} color={message.color} />
       ) : null}
-      {user === null ? (
-        loginForm()
-      ) : (
+      {!user && loginForm()}
+      {user && (
         <div>
           <p>
             {user.name} logged-in <button onClick={handleLogout}>Logout</button>
           </p>
 
-          <h2>Create new</h2>
-          {blogForm()}
+          <Togglable buttonLabel="new blog">{blogForm()}</Togglable>
 
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
