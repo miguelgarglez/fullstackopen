@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -12,6 +12,10 @@ const App = () => {
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
 
+  const blogRef = useRef();
+
+  const blogFormRef = useRef();
+
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
     if (loggedUserJSON) {
@@ -22,8 +26,14 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    blogService.getAll().then((blogs) => {
+      setBlogs(orderBlogs(blogs));
+    });
   }, []);
+
+  const orderBlogs = (blogs) => {
+    return blogs.sort((a, b) => b.likes - a.likes);
+  };
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -50,10 +60,12 @@ const App = () => {
 
   const addBlog = async (blogObject) => {
     try {
+      blogFormRef.current.toggleVisibility();
       const newBlog = await blogService.create(blogObject);
       const populatedBlog = await blogService.getOne(newBlog.id);
       setBlogs(blogs.concat(populatedBlog));
       console.log("populatedBlog:", populatedBlog);
+
       setMessage({
         content: `a new blog ${newBlog.title} by ${newBlog.author} added`,
         color: "green",
@@ -63,6 +75,34 @@ const App = () => {
       }, 5000);
     } catch (exception) {
       setMessage({ content: "Error adding blog", color: "red" });
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+    }
+  };
+
+  const updateBlog = async (id, update) => {
+    const updatedBlog = await blogService.update(id, update);
+    if (updatedBlog) {
+      blogRef.current.setLikes(updatedBlog.likes);
+    }
+  };
+
+  const deleteBlog = async (blog) => {
+    try {
+      if (window.confirm(`Remove ${blog.title} by ${blog.author}?`)) {
+        await blogService.remove(blog.id);
+        setBlogs(blogs.filter((b) => b.id !== blog.id));
+        setMessage({
+          content: `Blog ${blog.title} by ${blog.author} removed`,
+          color: "green",
+        });
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      }
+    } catch (exception) {
+      setMessage({ content: "Error removing blog", color: "red" });
       setTimeout(() => {
         setMessage(null);
       }, 5000);
@@ -115,10 +155,19 @@ const App = () => {
             {user.name} logged-in <button onClick={handleLogout}>Logout</button>
           </p>
 
-          <Togglable buttonLabel="new blog">{blogForm()}</Togglable>
+          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+            {blogForm()}
+          </Togglable>
 
           {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              updateBlog={updateBlog}
+              deleteBlog={deleteBlog}
+              currentLoggedInUser={user}
+              ref={blogRef}
+            />
           ))}
         </div>
       )}
