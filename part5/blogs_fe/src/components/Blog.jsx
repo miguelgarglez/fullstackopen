@@ -15,8 +15,6 @@ const Blog = forwardRef(
     }
 
     const toggleVisibility = () => {
-      console.log('currentLoggedInUser:', currentLoggedInUser)
-      console.log('blog.user:', blog.user)
       setVisibleDetails(!visibleDetails)
     }
 
@@ -43,11 +41,16 @@ const Blog = forwardRef(
     return (
       <div style={blogStyle}>
         <div>
-          {blog.title} - {blog.author}{' '}
-          <button onClick={toggleVisibility}>
-            {visibleDetails ? 'hide' : 'view'}
-          </button>
-          <div style={{ display: visibleDetails ? '' : 'none' }}>
+          <span id="blogHeader">
+            {blog.title} - {blog.author}{' '}
+            <button id="toggleButton" onClick={toggleVisibility}>
+              {visibleDetails ? 'hide' : 'view'}
+            </button>
+          </span>
+          <div
+            style={{ display: visibleDetails ? '' : 'none' }}
+            id="blogDetails"
+          >
             <div>{blog.url}</div>
             <div>
               likes: {likes} <button onClick={handleLike}>like</button>

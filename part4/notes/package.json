@@ -11,7 +11,8 @@
     "build:ui": "rm -rf build && cd ../../part2/experiments/ && npm run build && cp -r build ../../part4",
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
-    "logs:prod": "fly logs"
+    "logs:prod": "fly logs",
+    "start:test": "NODE_ENV=test node index.js"
   },
   "author": "",
   "license": "ISC",
