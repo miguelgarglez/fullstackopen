@@ -6,111 +6,109 @@ import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Togglable";
 
 const App = () => {
-  const [message, setMessage] = useState({ content: null, color: "green" });
-  const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
+  const [message, setMessage] = useState({ content: null, color: 'green' })
+  const [blogs, setBlogs] = useState([])
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
 
-  const blogRef = useRef();
-
-  const blogFormRef = useRef();
+  const blogFormRef = useRef()
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-      blogService.setToken(user.token);
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     blogService.getAll().then((blogs) => {
-      setBlogs(orderBlogs(blogs));
-    });
-  }, []);
+      setBlogs(orderBlogs(blogs))
+    })
+  }, [])
 
   const orderBlogs = (blogs) => {
-    return blogs.sort((a, b) => b.likes - a.likes);
-  };
+    return blogs.sort((a, b) => b.likes - a.likes)
+  }
 
   const handleLogin = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     try {
       const user = await loginService.login({
         username,
         password,
-      });
+      })
 
-      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
 
-      blogService.setToken(user.token);
-      setUser(user);
-      setUsername("");
-      setPassword("");
+      blogService.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
     } catch (exception) {
-      setMessage({ content: `Wrong username or password`, color: "red" });
+      setMessage({ content: `Wrong username or password`, color: 'red' })
       setTimeout(() => {
-        setMessage(null);
-      }, 5000);
+        setMessage(null)
+      }, 5000)
     }
-  };
+  }
 
   const addBlog = async (blogObject) => {
     try {
-      blogFormRef.current.toggleVisibility();
-      const newBlog = await blogService.create(blogObject);
-      const populatedBlog = await blogService.getOne(newBlog.id);
-      setBlogs(blogs.concat(populatedBlog));
-      console.log("populatedBlog:", populatedBlog);
+      blogFormRef.current.toggleVisibility()
+      const newBlog = await blogService.create(blogObject)
+      const populatedBlog = await blogService.getOne(newBlog.id)
+      setBlogs(blogs.concat(populatedBlog))
+      console.log('populatedBlog:', populatedBlog)
 
       setMessage({
         content: `a new blog ${newBlog.title} by ${newBlog.author} added`,
-        color: "green",
-      });
+        color: 'green',
+      })
       setTimeout(() => {
-        setMessage(null);
-      }, 5000);
+        setMessage(null)
+      }, 5000)
     } catch (exception) {
-      setMessage({ content: "Error adding blog", color: "red" });
+      setMessage({ content: 'Error adding blog', color: 'red' })
       setTimeout(() => {
-        setMessage(null);
-      }, 5000);
+        setMessage(null)
+      }, 5000)
     }
-  };
+  }
 
   const updateBlog = async (id, update) => {
-    const updatedBlog = await blogService.update(id, update);
+    const updatedBlog = await blogService.update(id, update)
     if (updatedBlog) {
-      blogRef.current.setLikes(updatedBlog.likes);
+      setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updatedBlog)))
     }
-  };
+  }
 
   const deleteBlog = async (blog) => {
     try {
       if (window.confirm(`Remove ${blog.title} by ${blog.author}?`)) {
-        await blogService.remove(blog.id);
-        setBlogs(blogs.filter((b) => b.id !== blog.id));
+        await blogService.remove(blog.id)
+        setBlogs(blogs.filter((b) => b.id !== blog.id))
         setMessage({
           content: `Blog ${blog.title} by ${blog.author} removed`,
-          color: "green",
-        });
+          color: 'green',
+        })
         setTimeout(() => {
-          setMessage(null);
-        }, 5000);
+          setMessage(null)
+        }, 5000)
       }
     } catch (exception) {
-      setMessage({ content: "Error removing blog", color: "red" });
+      setMessage({ content: 'Error removing blog', color: 'red' })
       setTimeout(() => {
-        setMessage(null);
-      }, 5000);
+        setMessage(null)
+      }, 5000)
     }
-  };
+  }
 
   const loginForm = () => (
-    <form onSubmit={handleLogin}>
+    <form id="login-form" onSubmit={handleLogin}>
       <div>
         username
         <input
@@ -118,6 +116,7 @@ const App = () => {
           value={username}
           name="Username"
           onChange={({ target }) => setUsername(target.value)}
+          id="username"
         />
       </div>
       <div>
@@ -127,20 +126,23 @@ const App = () => {
           value={password}
           name="Password"
           onChange={({ target }) => setPassword(target.value)}
+          id="password"
         />
       </div>
-      <button type="submit">login</button>
+      <button id="login-button" type="submit">
+        login
+      </button>
     </form>
-  );
+  )
 
   const handleLogout = () => {
-    window.localStorage.removeItem("loggedBlogappUser");
-    setUser(null);
-  };
+    window.localStorage.removeItem('loggedBlogappUser')
+    setUser(null)
+  }
 
   const blogForm = () => {
-    return <BlogForm createBlog={addBlog} />;
-  };
+    return <BlogForm createBlog={addBlog} />
+  }
 
   return (
     <div>
@@ -152,7 +154,10 @@ const App = () => {
       {user && (
         <div>
           <p>
-            {user.name} logged-in <button onClick={handleLogout}>Logout</button>
+            {user.name} logged-in{' '}
+            <button id="logout" onClick={handleLogout}>
+              Logout
+            </button>
           </p>
 
           <Togglable buttonLabel="new blog" ref={blogFormRef}>
@@ -166,31 +171,34 @@ const App = () => {
               updateBlog={updateBlog}
               deleteBlog={deleteBlog}
               currentLoggedInUser={user}
-              ref={blogRef}
             />
           ))}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 const Notification = ({ message, color }) => {
   const notificationStyle = {
     color: color,
-    background: "lightgrey",
+    background: 'lightgrey',
     fontSize: 20,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-  };
-
-  if (message === null) {
-    return null;
   }
 
-  return <div style={notificationStyle}>{message}</div>;
-};
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="message" style={notificationStyle}>
+      {message}
+    </div>
+  )
+}
 
 export default App;
