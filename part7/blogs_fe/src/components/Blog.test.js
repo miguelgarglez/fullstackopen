@@ -1,7 +1,7 @@
 import React from 'react'
 import '@testing-library/jest-dom'
 import { render, screen, waitFor } from '@testing-library/react'
-import Blog from './Blog'
+import Blog from './BlogList'
 import userEvent from '@testing-library/user-event'
 
 describe('<Blog />', () => {

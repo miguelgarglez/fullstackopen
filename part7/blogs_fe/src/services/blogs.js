@@ -42,4 +42,4 @@ const remove = async (id) => {
 }
 
 
-export default { getAll, create, getOne, update, remove, setToken}
+export default { getAll, create, getOne, update, remove, setToken }

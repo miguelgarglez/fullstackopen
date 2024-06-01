@@ -1,10 +1,15 @@
 import { forwardRef, useState } from 'react'
 import PropTypes from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
+import { likeBlog, deleteBlog } from '../reducers/blogReducer'
+import { setNotification } from '../reducers/notificationReducer'
 
-const Blog = ({ blog, updateBlog, deleteBlog, currentLoggedInUser }) => {
+const Blog = ({ blog }) => {
   const [visibleDetails, setVisibleDetails] = useState(false)
-  const [likes, setLikes] = useState(blog.likes)
 
+  const currentLoggedInUser = useSelector((state) => state.user)
+
+  const dispatch = useDispatch()
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -18,18 +23,23 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentLoggedInUser }) => {
   }
 
   const handleLike = async () => {
-    await updateBlog(blog.id, {
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: blog.likes + 1,
-      user: blog.user.id,
-    })
-    setLikes(likes + 1)
+    dispatch(likeBlog(blog.id, blog))
+    dispatch(
+      setNotification({
+        message: `You liked '${blog.title}'`,
+        seconds: 5,
+      })
+    )
   }
 
   const handleRemove = async () => {
-    await deleteBlog(blog)
+    dispatch(deleteBlog(blog))
+    dispatch(
+      setNotification({
+        message: `You removed '${blog.title}'`,
+        seconds: 5,
+      })
+    )
   }
 
   return (
@@ -44,7 +54,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentLoggedInUser }) => {
         <div style={{ display: visibleDetails ? '' : 'none' }} id="blogDetails">
           <div>{blog.url}</div>
           <div>
-            likes: {likes} <button onClick={handleLike}>like</button>
+            likes: {blog.likes} <button onClick={handleLike}>like</button>
           </div>
           {blog.user ? <div>{blog.user.name}</div> : null}
           {blog.user &&
@@ -58,13 +68,25 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentLoggedInUser }) => {
   )
 }
 
+const BlogList = () => {
+  const blogs = useSelector((state) => {
+    const blogs = state.blogs
+    return [...blogs].sort((a, b) => b.likes - a.likes)
+  })
+
+  return (
+    <div>
+      {blogs.map((blog) => (
+        <Blog key={blog.id} blog={blog} />
+      ))}
+    </div>
+  )
+}
+
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  updateBlog: PropTypes.func.isRequired,
-  deleteBlog: PropTypes.func.isRequired,
-  currentLoggedInUser: PropTypes.object.isRequired,
 }
 
 Blog.displayName = 'Blog'
 
-export default Blog
+export default BlogList
