@@ -1,15 +1,11 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { clearNotification } from '../reducers/notificationReducer'
 import { useEffect } from 'react'
+import { Alert } from 'react-bootstrap'
 
 const Notification = () => {
   const dispatch = useDispatch()
   const notification = useSelector((state) => state.notification)
-  const style = {
-    border: 'solid',
-    padding: 10,
-    borderWidth: 1,
-  }
 
   // Limpiar la notificación después de la duración especificada
   useEffect(() => {
@@ -24,7 +20,9 @@ const Notification = () => {
   }, [dispatch, notification])
 
   return notification.message ? (
-    <div style={style}>{notification.message}</div>
+    <div className="container">
+      <Alert variant="success">{notification.message}</Alert>
+    </div>
   ) : null
 }
 

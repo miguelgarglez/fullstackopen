@@ -3,21 +3,25 @@ const mongoose = require('mongoose')
 const blogSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true
+    required: true,
   },
   author: String,
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
   },
   url: {
     type: String,
-    required: true
+    required: true,
   },
   likes: {
     type: Number,
-    default: 0
-  }
+    default: 0,
+  },
+  comments: {
+    type: Array,
+    default: [],
+  },
 })
 
 

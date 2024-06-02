@@ -1,29 +1,16 @@
-import { forwardRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
-import { likeBlog, deleteBlog } from '../reducers/blogReducer'
-import { setNotification } from '../reducers/notificationReducer'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { Table } from 'react-bootstrap'
 
 const BlogTile = ({ blog }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
-
   return (
-    <div className="blog" style={blogStyle}>
-      <div>
-        <span id="blogHeader">
-          <Link to={`/blogs/${blog.id}`}>
-            {blog.title} {blog.author}
-          </Link>
-        </span>
-      </div>
-    </div>
+    <>
+      <td>
+        <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+      </td>
+      <td>{blog.author}</td>
+    </>
   )
 }
 
@@ -35,9 +22,15 @@ const BlogList = () => {
 
   return (
     <div>
-      {blogs.map((blog) => (
-        <BlogTile key={blog.id} blog={blog} />
-      ))}
+      <Table hover bordered>
+        <tbody>
+          {blogs.map((blog) => (
+            <tr key={blog.id}>
+              <BlogTile blog={blog} />
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </div>
   )
 }

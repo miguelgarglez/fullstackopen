@@ -2,9 +2,12 @@ import PropTypes from 'prop-types'
 import { createBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
 import { useDispatch } from 'react-redux'
+import { Form, Button } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom'
 
 const BlogForm = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const addBlog = (event) => {
     event.preventDefault()
     dispatch(
@@ -14,6 +17,7 @@ const BlogForm = () => {
         url: event.target.url.value,
       })
     )
+    navigate('/')
     dispatch(
       setNotification({
         message: `You created '${event.target.title.value}'`,
@@ -26,27 +30,30 @@ const BlogForm = () => {
   }
 
   return (
-    <form id="blog-form" onSubmit={addBlog}>
-      <div>
-        <label htmlFor="newBlogTitle">Title:</label>
-        <input id="newBlogTitle" name="title" placeholder="enter title here" />
-      </div>
-      <div>
-        <label htmlFor="newBlogAuthor">Author:</label>
-        <input
+    <Form id="blog-form" onSubmit={addBlog}>
+      <Form.Group style={{ marginTop: '20px' }}>
+        <Form.Label htmlFor="newBlogTitle">Title:</Form.Label>
+        <Form.Control type="text" name="title" placeholder="Enter title here" />
+      </Form.Group>
+
+      <Form.Group style={{ marginTop: '20px' }}>
+        <Form.Label htmlFor="newBlogAuthor">Author:</Form.Label>
+        <Form.Control
           id="newBlogAuthor"
           name="author"
-          placeholder="enter author here"
+          placeholder="Enter author here"
         />
+      </Form.Group>
+      <Form.Group style={{ marginTop: '20px' }}>
+        <Form.Label htmlFor="newBlogUrl">URL:</Form.Label>
+        <Form.Control id="newBlogUrl" name="url" placeholder="Enter URL here" />
+      </Form.Group>
+      <div style={{ marginTop: '20px' }}>
+        <Button id="create-blog" type="submit">
+          Create
+        </Button>
       </div>
-      <div>
-        <label htmlFor="newBlogUrl">URL:</label>
-        <input id="newBlogUrl" name="url" placeholder="enter URL here" />
-      </div>
-      <button id="create-blog" type="submit">
-        Create
-      </button>
-    </form>
+    </Form>
   )
 }
 
