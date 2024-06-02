@@ -56,6 +56,7 @@ export const likeBlog = (id, blogToChange) => {
   return async (dispatch) => {
     const changedBlog = {
       ...blogToChange,
+      user: blogToChange.user ? blogToChange.user.id : null,
       likes: blogToChange.likes + 1,
     }
     await blogService.update(id, changedBlog)

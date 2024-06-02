@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { loginUser } from '../reducers/userReducer'
+import { loginUser } from '../reducers/loginReducer'
 import { setNotification } from '../reducers/notificationReducer'
 const LoginForm = () => {
   const dispatch = useDispatch()
