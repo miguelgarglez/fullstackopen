@@ -1,6 +1,5 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
-const { gql } = require('apollo-server')
 const { v1: uuid } = require('uuid')
 const { GraphQLError } = require('graphql')
 
@@ -27,10 +26,21 @@ let persons = [
   },
 ]
 
-const typeDefs = gql`
+const typeDefs = `
   type Address {
     street: String!
-    city: String!
+    city: String! 
+  }
+
+  enum YesNo {
+    YES
+    NO
+  }
+  
+  type Query {
+    personCount: Int!
+    allPersons(phone: YesNo): [Person!]!
+    findPerson(name: String!): Person
   }
 
   type Person {
@@ -40,24 +50,11 @@ const typeDefs = gql`
     id: ID!
   }
 
-  enum YesNo {
-    YES
-    NO
+  type Query {
+    personCount: Int!
+    allPersons: [Person!]!
+    findPerson(name: String!): Person
   }
-
-    Query: {
-    personCount: () => persons.length,
-    allPersons: (root, args) => {
-        if (!args.phone) {
-        return persons
-        }
-        const byPhone = (person) =>
-        args.phone === 'YES' ? person.phone : !person.phone
-        return persons.filter(byPhone)
-    },
-    findPerson: (root, args) =>
-        persons.find(p => p.name === args.name)
-    },
 
   type Mutation {
     addPerson(
@@ -66,24 +63,32 @@ const typeDefs = gql`
       street: String!
       city: String!
     ): Person
+
     editNumber(
-    name: String!
-    phone: String!
-  ): Person
+      name: String!
+      phone: String!
+    ): Person
   }
 `
 
 const resolvers = {
   Query: {
     personCount: () => persons.length,
-    allPersons: () => persons,
+    allPersons: (root, args) => {
+      if (!args.phone) {
+        return persons
+      }
+      const byPhone = (person) =>
+        args.phone === 'YES' ? person.phone : !person.phone
+      return persons.filter(byPhone)
+    },
     findPerson: (root, args) => persons.find((p) => p.name === args.name),
   },
   Person: {
-    address: (root) => {
+    address: ({ street, city }) => {
       return {
-        street: root.street,
-        city: root.city,
+        street,
+        city,
       }
     },
   },
@@ -97,7 +102,6 @@ const resolvers = {
           },
         })
       }
-
       const person = { ...args, id: uuid() }
       persons = persons.concat(person)
       return person
