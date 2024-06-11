@@ -57,6 +57,8 @@ const typeDefs = gql`
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
     me: User
+    favourites: [Book!]!
+    allGenres: [String!]!
   }
 
   type Mutation {
@@ -100,6 +102,27 @@ const resolvers = {
     me: (root, args, context) => {
       return context.currentUser
     },
+    favourites: async (root, args, context) => {
+      const currentUser = context.currentUser
+
+      if (!currentUser) {
+        throw new GraphQLError('not authenticated', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+          },
+        })
+      }
+
+      const books = await Book.find({
+        genres: { $in: [currentUser.favoriteGenre] },
+      }).populate('author')
+      return books
+    },
+    allGenres: async () => {
+      const books = await Book.find({})
+      const genres = books.map((book) => book.genres).flat()
+      return [...new Set(genres)]
+    },
   },
   Author: {
     bookCount: async (root) => {
@@ -111,6 +134,8 @@ const resolvers = {
   Mutation: {
     addBook: async (root, args, context) => {
       const currentUser = context.currentUser
+
+      console.log('current user', currentUser)
 
       if (!currentUser) {
         throw new GraphQLError('not authenticated', {
@@ -207,9 +232,7 @@ startStandaloneServer(server, {
     const auth = req ? req.headers.authorization : null
     if (auth && auth.startsWith('Bearer ')) {
       const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET)
-      const currentUser = await User.findById(decodedToken.id).populate(
-        'friends'
-      )
+      const currentUser = await User.findById(decodedToken.id)
       return { currentUser }
     }
   },
