@@ -1,2 +1,3 @@
 # fullstackopen
-Free Full Stack Development course from University of Helsinki
+Free [Full Stack Development](https://fullstackopen.com/en/) course from University of Helsinki
+
