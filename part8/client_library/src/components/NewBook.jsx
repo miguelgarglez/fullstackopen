@@ -14,15 +14,8 @@ const NewBook = (props) => {
     onError: (error) => {
       console.log(error)
     },
-    update: (cache, response) => {
-      cache.updateQuery(
-        { query: ALL_BOOKS, variables: { genre: null } },
-        ({ allBooks }) => {
-          return {
-            allBooks: allBooks.concat(response.data.addBook),
-          }
-        }
-      )
+    update: (store, response) => {
+      updateCacheWith(response.data.addBook)
     },
   })
 
