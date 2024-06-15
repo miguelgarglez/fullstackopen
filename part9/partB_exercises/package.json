@@ -1,0 +1,17 @@
+{
+  "name": "partb_exercises",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "calculateBmi": "ts-node src/bmiCalculator.ts",
+    "calculateExercises": "ts-node src/exerciseCalculator.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
