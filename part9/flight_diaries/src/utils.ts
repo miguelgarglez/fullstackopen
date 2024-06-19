@@ -1,11 +1,12 @@
-import { NewDiaryEntry, Visibility, Weather } from './types';
+
+import { NewDiaryEntry, Weather, Visibility } from './types';
 
 const isString = (text: unknown): text is string => {
   return typeof text === 'string' || text instanceof String;
 };
 
 const parseComment = (comment: unknown): string => {
-  if (!comment || !isString(comment)) {
+  if (!isString(comment)) {
     throw new Error('Incorrect or missing comment');
   }
 
@@ -17,8 +18,8 @@ const isDate = (date: string): boolean => {
 };
 
 const parseDate = (date: unknown): string => {
-  if (!date || !isString(date) || !isDate(date)) {
-      throw new Error('Incorrect or missing date: ' + date);
+  if (!isString(date) || !isDate(date)) {
+      throw new Error('Incorrect date: ' + date);
   }
   return date;
 };
@@ -28,8 +29,8 @@ const isWeather = (param: string): param is Weather => {
 };
 
 const parseWeather = (weather: unknown): Weather => {
-  if (!weather || !isString(weather) || !isWeather(weather)) {
-      throw new Error('Incorrect or missing weather: ' + weather)
+  if (!isString(weather) || !isWeather(weather)) {
+    throw new Error('Incorrect weather: ' + weather);
   }
   return weather;
 };
@@ -39,8 +40,8 @@ const isVisibility = (param: string): param is Visibility => {
 };
 
 const parseVisibility = (visibility: unknown): Visibility => {
-  if (!visibility || !isString(visibility) || !isVisibility(visibility)) {
-      throw new Error('Incorrect or missing visibility: ' + visibility);
+  if (!isString(visibility) || !isVisibility(visibility)) {
+      throw new Error('Incorrect visibility: ' + visibility);
   }
   return visibility;
 };
@@ -57,11 +58,11 @@ const toNewDiaryEntry = (object: unknown): NewDiaryEntry => {
       date: parseDate(object.date),
       comment: parseComment(object.comment)
     };
-
+  
     return newEntry;
   }
 
-  throw new Error('Incorrect data: some fields are missing');
+  throw new Error('Incorrect data: a field missing');
 };
 
 export default toNewDiaryEntry;
