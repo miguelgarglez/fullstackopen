@@ -7,8 +7,8 @@ router.get('/', (_req, res) => {
   res.send(diagnoseService.getEntries());
 });
 
-router.post('/', (_req, res) => {
-  res.send('Saving a diagnose!');
+router.post('/', (req, res) => {
+  res.send(diagnoseService.addEntry(req.body));
 });
 
 export default router;

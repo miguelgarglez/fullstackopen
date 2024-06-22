@@ -1,4 +1,4 @@
-import { NewPatientEntry, Gender } from './types';
+import { NewPatientEntry, Gender, Entry } from './types';
 
 const isString = (text: unknown): text is string => {
   return typeof text === 'string' || text instanceof String;
@@ -50,18 +50,26 @@ const parseOccupation = (occupation: unknown): string => {
     return occupation;
 };
 
+const parseEntries = (entries: unknown): Entry[] => {
+  if (!entries || !Array.isArray(entries)) {
+    throw new Error('Incorrect or missing entries');
+  }
+  return entries;
+}
+
 const toNewPatientEntry = (object: unknown): NewPatientEntry => {
   if ( !object || typeof object !== 'object' ) {
     throw new Error('Incorrect or missing data');
   }
 
-  if ('name' in object && 'dateOfBirth' in object && 'ssn' in object && 'gender' in object && 'occupation' in object)  {
+  if ('name' in object && 'dateOfBirth' in object && 'ssn' in object && 'gender' in object && 'occupation' in object && 'entries' in object)  {
     const newEntry: NewPatientEntry = {
       name: parseName(object.name),
       dateOfBirth: parseDate(object.dateOfBirth),
       ssn: parseSsn(object.ssn),
       gender: parseGender(object.gender),
-      occupation: parseOccupation(object.occupation)
+      occupation: parseOccupation(object.occupation),
+      entries: parseEntries(object.entries)
     };
 
     return newEntry;
