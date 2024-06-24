@@ -1,10 +1,13 @@
-import { Patient, Entry } from '../../types';
+import { Patient, Entry, EntryFormValues } from '../../types';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import TransgenderIcon from '@mui/icons-material/Transgender';
 import { useEffect, useState } from 'react';
 import patientService from '../../services/patients';
 import EntryTile from './PatientEntries';
+import { Button } from '@mui/material';
+import AddEntryModal from '../AddEntryModal';
+import axios from 'axios';
 
 const PatientInfo = ({
   patientId,
@@ -12,6 +15,14 @@ const PatientInfo = ({
   patientId: string | undefined | null;
 }) => {
   const [patient, setPatient] = useState<Patient | null>(null);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [error, setError] = useState<string>();
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
 
   useEffect(() => {
     if (patientId) {
@@ -20,6 +31,30 @@ const PatientInfo = ({
       });
     }
   }, [patientId]);
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    try {
+      const entry = await patientService.addEntry(patientId!, values);
+      patient?.entries.push(entry);
+      setModalOpen(false);
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        if (e?.response?.data && typeof e?.response?.data === 'string') {
+          const message = e.response.data.replace(
+            'Something went wrong. Error: ',
+            ''
+          );
+          console.error(message);
+          setError(message);
+        } else {
+          setError('Unrecognized axios error');
+        }
+      } else {
+        console.error('Unknown error', e);
+        setError('Unknown error');
+      }
+    }
+  };
 
   if (!patient) {
     return <h3>No patient info loaded</h3>;
@@ -37,7 +72,16 @@ const PatientInfo = ({
       )}
       <p>ssn: {patient.ssn}</p>
       <p>occupation: {patient.occupation}</p>
+      <Button variant="contained" onClick={() => openModal()}>
+        Add New Entry
+      </Button>
       <EntryList entries={patient.entries} />
+      <AddEntryModal
+        modalOpen={modalOpen}
+        onSubmit={submitNewEntry}
+        error={error}
+        onClose={closeModal}
+      />
     </div>
   );
 };
@@ -68,6 +112,15 @@ const PatientInfo = ({
 };*/
 
 const EntryList = ({ entries }: { entries: Entry[] }) => {
+  if (entries.length === 0) {
+    return (
+      <>
+        <h2>entries</h2>
+        <p>No entries yet</p>
+      </>
+    );
+  }
+
   return (
     <div>
       <h2>entries</h2>
